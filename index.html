@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mahen's Birthday Scrapbook</title>
+  <meta name="description" content="A handmade paper-scrapbook birthday experience." />
+
+  <!-- Fonts: handwriting pair used across the whole experience -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <div id="stage-root">
+
+    <!-- Shared full-screen flash used between every page transition -->
+    <div class="flash-overlay" id="flashOverlay" aria-hidden="true"></div>
+
+    <!-- ===================================================================
+         PAGE 1 — BIRTHDAY INVITATION
+         =================================================================== -->
+    <section class="page page--active" id="page1" data-page="page1">
+      <div class="bg-stripe" aria-hidden="true"></div>
+      <div class="bg-vignette" aria-hidden="true"></div>
+
+      <div class="page1-stage" id="page1Stage">
+
+        <div class="envelope-zone" id="envelopeZone">
+
+          <div class="envelope-shadow" id="envelopeShadow" aria-hidden="true"></div>
+
+          <!-- Invitation card: starts tucked behind the envelope opening,
+               GSAP slides it up ~70% out on open. Kept above the envelope
+               in z-index so it always reads as sitting on top of it. -->
+          <div class="invitation-card" id="invitationCard">
+            <img class="invitation-card__paper" src="assets/images/page1/invitation_card.webp" alt="" />
+
+            <div class="invitation-card__content">
+              <p class="invitation-card__eyebrow" id="invitationEyebrow"></p>
+              <p class="invitation-card__greeting" id="invitationGreeting"></p>
+              <div id="invitationBody"><!-- paragraphs injected from config.js --></div>
+              <p class="invitation-card__closing" id="invitationClosing"></p>
+            </div>
+
+            <div class="invitation-card__sticker invitation-card__sticker--photo" id="stickerPhoto">
+              <span class="washi-tape" aria-hidden="true"></span>
+              <img src="assets/images/page1/sticker_photo.webp" alt="" />
+            </div>
+
+            <img
+              class="invitation-card__sticker invitation-card__sticker--cake"
+              id="stickerCake"
+              src="assets/images/page1/sticker_cake.webp"
+              alt=""
+            />
+            <img
+              class="invitation-card__sticker invitation-card__sticker--balloon"
+              id="stickerBalloon"
+              src="assets/images/page1/sticker_balloon.webp"
+              alt=""
+            />
+          </div>
+
+          <button class="envelope-btn" id="envelopeBtn" type="button" aria-label="Open the envelope">
+            <img class="envelope-img" id="envelopeImg" alt="Sealed envelope" />
+          </button>
+        </div>
+
+        <div class="invitation-actions" id="invitationActions">
+          <button class="paper-btn paper-btn--primary" id="joinBtn" type="button"></button>
+          <button class="paper-btn paper-btn--ghost" id="notTodayBtn" type="button"></button>
+        </div>
+
+        <div class="maybe-panel" id="maybePanel">
+          <p class="maybe-panel__text" id="maybeText"></p>
+          <button class="paper-btn paper-btn--primary" id="openAgainBtn" type="button"></button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         PAGE 2 — SAVE THE DATE
+         =================================================================== -->
+    <section class="page" id="page2" data-page="page2" hidden>
+      <div class="bg-stripe" aria-hidden="true"></div>
+      <div class="bg-vignette" aria-hidden="true"></div>
+
+      <div class="page2-stage" id="page2Stage">
+
+        <div class="page2-title">
+          <p class="page2-title__eyebrow" id="page2Eyebrow"></p>
+          <p class="page2-title__name" id="page2Name"></p>
+        </div>
+
+        <div class="calendar-wrap" id="calendarWrap">
+          <div class="calendar-spiral" id="calendarSpiral" aria-hidden="true"></div>
+          <div class="calendar-card">
+            <p class="calendar-month" id="calendarMonth"></p>
+            <div class="calendar-grid" id="calendarGrid"></div>
+          </div>
+        </div>
+
+        <button class="cake-cta" id="cakeCta" type="button" aria-label="Continue to cake decorating">
+          <img id="cakeCtaImg" alt="" />
+          <span class="cake-cta__label" id="cakeCtaLabel"></span>
+        </button>
+
+        <!-- Decorative stickers, positioned entirely from config.js -->
+        <div class="decoration-layer" id="decorationLayer"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         PAGE 3 — DECORATE YOUR CAKE
+         =================================================================== -->
+    <section class="page" id="page3" data-page="page3" hidden>
+      <div class="bg-stripe" aria-hidden="true"></div>
+      <div class="bg-vignette" aria-hidden="true"></div>
+
+      <div class="page3-stage" id="page3Stage">
+
+        <div class="page3-title">
+          <p class="page3-title__heading" id="page3Heading"></p>
+          <p class="page3-title__subtitle" id="page3Subtitle"></p>
+        </div>
+
+        <div class="cake-drop-zone" id="cakeDropZone">
+          <img class="cake-drop-zone__img" id="cakeImg" alt="" />
+          <!-- dekorasi yang sudah ditempel dirender di sini oleh page3.js -->
+        </div>
+
+        <div class="deco-tray" id="decoTray">
+          <div class="deco-tray__toggle-row">
+            <button class="deco-tray__toggle" id="trayToggle" type="button"></button>
+          </div>
+          <div class="deco-tray__panel" id="trayPanel">
+            <div class="deco-tray__tabs">
+              <button class="deco-tray__tab is-active" id="tabStickers" type="button"></button>
+              <button class="deco-tray__tab" id="tabLetters" type="button"></button>
+            </div>
+            <div class="deco-tray__scroll" id="trayStickers"></div>
+            <div class="deco-tray__scroll" id="trayLetters" hidden></div>
+          </div>
+        </div>
+
+        <div class="page3-actions">
+          <button class="paper-btn paper-btn--ghost" id="undoBtn" type="button" disabled></button>
+          <button class="paper-btn paper-btn--ghost" id="redoBtn" type="button" disabled></button>
+          <button class="paper-btn paper-btn--primary" id="finishBtn" type="button" disabled></button>
+        </div>
+      </div>
+
+      <div class="confirm-popup" id="confirmPopup" hidden>
+        <div class="confirm-popup__card" id="confirmPopupCard">
+          <p id="confirmPopupText"></p>
+          <div class="confirm-popup__actions">
+            <button class="paper-btn paper-btn--ghost" id="popupBack" type="button"></button>
+            <button class="paper-btn paper-btn--primary" id="popupFinish" type="button"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         PAGE 4 — BIRTHDAY WISHES
+         =================================================================== -->
+    <section class="page" id="page4" data-page="page4" hidden>
+      <div class="bg-stripe" aria-hidden="true"></div>
+      <div class="bg-vignette" aria-hidden="true"></div>
+
+      <div class="page4-stage" id="page4Stage">
+
+        <!-- Cake echoed from Page 3 — same decorations, same positions -->
+        <div class="page4-cake-zone" id="page4CakeZone">
+          <img class="page4-cake-zone__img" id="page4CakeImg" alt="" />
+          <img class="page4-candle" id="page4Candle" alt="" />
+          <!-- dekorasi dari Page 3 dirender ulang di sini oleh page4.js -->
+        </div>
+
+        <p class="page4-heading" id="page4Heading"></p>
+
+        <div class="wishes-grid" id="wishesGrid">
+          <!-- 4 wish-card + 1 wish-card--custom dirender oleh page4.js -->
+        </div>
+
+        <button class="paper-btn paper-btn--primary blow-btn" id="blowBtn" type="button"></button>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         PAGE 5 — THANK YOU
+         =================================================================== -->
+    <section class="page" id="page5" data-page="page5" hidden>
+      <div class="bg-stripe" aria-hidden="true"></div>
+      <div class="bg-vignette" aria-hidden="true"></div>
+
+      <div class="page5-stage" id="page5Stage">
+        <div class="page5-decoration-layer" id="page5DecorationLayer"></div>
+
+        <div class="thankyou-text">
+          <p class="thankyou-text__line" id="thankyouLine1"></p>
+          <p class="thankyou-text__line" id="thankyouLine2"></p>
+          <p class="thankyou-text__line" id="thankyouLine3"></p>
+          <p class="thankyou-text__extra" id="thankyouExtra"></p>
+          <p class="thankyou-text__heart" id="thankyouHeart"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Soft local overlay for the candle-blow smoke moment -->
+    <div class="blow-overlay" id="blowOverlay" aria-hidden="true"></div>
+
+    <!-- Layer tempat "ghost" sticker/huruf yang sedang di-drag dirender.
+         Selalu ada di DOM, terlepas dari page mana yang sedang aktif. -->
+    <div id="dragGhostLayer"></div>
+
+  </div>
+
+  <!-- Audio elements -->
+  <audio id="bgm" preload="auto" loop></audio>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <!-- Config first (defines SITE_CONFIG used by everything below) -->
+  <script src="config.js"></script>
+
+  <!-- Shared modules -->
+  <script src="assets/js/audio-manager.js"></script>
+  <script src="assets/js/router.js"></script>
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/ui-helpers.js"></script>
+
+  <!-- Page modules -->
+  <script src="assets/js/pages/page1.js"></script>
+  <script src="assets/js/pages/page2.js"></script>
+  <script src="assets/js/pages/page3-sticker-svgs.js"></script>
+  <script src="assets/js/pages/page3.js"></script>
+  <script src="assets/js/pages/page4.js"></script>
+  <script src="assets/js/pages/page5.js"></script>
+
+  <!-- Boot -->
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

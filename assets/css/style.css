@@ -1,0 +1,1136 @@
+/* =========================================================================
+   BIRTHDAY SCRAPBOOK EXPERIENCE — STYLESHEET
+   -------------------------------------------------------------------------
+   Struktur file ini akan bertambah seiring page baru ditambahkan.
+   Cari header "PAGE 1" dsb untuk lompat ke bagian yang relevan.
+
+   Catatan penting:
+   - Semua ANIMASI transform/opacity dikendalikan oleh GSAP di file JS,
+     BUKAN oleh CSS transition/keyframes. CSS di sini hanya bertanggung
+     jawab atas layout, warna, tipografi, dan bentuk statis.
+   - Sengaja tidak ada library CSS (Bootstrap dsb).
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   1. DESIGN TOKENS
+   ------------------------------------------------------------------------- */
+:root {
+  /* Warna diambil langsung dari palet asset asli (stripe background,
+     balon, tinta merah pada sticker foto) supaya seluruh situs terasi
+     satu keluarga warna yang sama, bukan palet generik. */
+  --color-cream: #F0EED9;         /* krem dari background stripe */
+  --color-cream-soft: #FBF8F0;    /* krem lebih terang, untuk permukaan kartu/tombol */
+  --color-dusty-blue: #BBCCD6;    /* biru dari background stripe */
+  --color-dusty-blue-deep: #8CA9B7;
+
+  --color-teal: #6E9C93;          /* dari sticker balon */
+  --color-teal-dark: #4F7A72;
+
+  --color-brick: #9C3532;         /* dari tinta merah sticker foto */
+  --color-brick-dark: #7C2A27;
+
+  --color-ink: #453B33;           /* coklat hangat untuk teks utama */
+  --color-ink-soft: #6B5F54;      /* untuk teks sekunder */
+
+  --shadow-paper-sm: 0 4px 10px rgba(69, 59, 51, 0.14);
+  --shadow-paper-md: 0 10px 24px rgba(69, 59, 51, 0.18), 0 2px 6px rgba(69, 59, 51, 0.10);
+  --shadow-paper-lg: 0 18px 40px rgba(69, 59, 51, 0.22), 0 4px 10px rgba(69, 59, 51, 0.12);
+
+  --font-display: "Caveat", cursive;
+  --font-body: "Patrick Hand", cursive;
+
+  /* Ukuran target sentuh minimum (aksesibilitas mobile) */
+  --tap-min: 44px;
+}
+
+/* -------------------------------------------------------------------------
+   2. RESET & BASE
+   ------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-cream);
+  -webkit-tap-highlight-color: transparent;
+}
+
+img { display: block; max-width: 100%; user-select: none; -webkit-user-drag: none; }
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+p { margin: 0; }
+
+/* Root app wrapper — holds every page section, always fills the viewport */
+#stage-root {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Generic page section. Pages stack on top of each other; only the
+   active one is interactive/visible. Page modules handle their own
+   enter/exit animation via GSAP — this just defines the resting state. */
+.page {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page[hidden] { display: none; }
+
+/* Full-screen white flash used between pages (physical "camera flash"
+   transition). Sits above every page. */
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  background: #FFFDF8;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 500;
+}
+
+/* Temporary stub styling for pages not built yet */
+.page-stub {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-cream);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 2.4rem);
+  color: var(--color-ink-soft);
+  text-align: center;
+  padding: 2rem;
+}
+
+/* -------------------------------------------------------------------------
+   3. SHARED — background stripe + vignette (reused across pages)
+   ------------------------------------------------------------------------- */
+.bg-stripe {
+  position: absolute;
+  inset: 0;
+  background-image: url("../images/page1/background_light.jpg");
+  background-repeat: repeat;
+  background-size: 220px auto;
+  z-index: 0;
+}
+
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(69, 59, 51, 0) 45%,
+    rgba(69, 59, 51, 0.10) 78%,
+    rgba(69, 59, 51, 0.24) 100%
+  );
+}
+
+/* -------------------------------------------------------------------------
+   4. PAPER BUTTONS (shared component — paper label look)
+   ------------------------------------------------------------------------- */
+.paper-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-min);
+  padding: 0.55em 1.6em;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: clamp(1.05rem, 3.4vw, 1.25rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  box-shadow: var(--shadow-paper-sm);
+  will-change: transform;
+}
+
+.paper-btn--primary {
+  background: var(--color-teal);
+  color: var(--color-cream-soft);
+}
+
+.paper-btn--ghost {
+  background: var(--color-cream-soft);
+  color: var(--color-brick);
+  box-shadow: var(--shadow-paper-sm), inset 0 0 0 2px rgba(156, 53, 50, 0.35);
+}
+
+/* -------------------------------------------------------------------------
+   5. PAGE 1 — BIRTHDAY INVITATION
+   ------------------------------------------------------------------------- */
+#page1 .page1-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.1rem, 4vh, 2rem);
+  padding: clamp(1rem, 5vw, 2rem);
+}
+
+/* Envelope + card share one positioning context so the card can be
+   precisely tucked "inside" the envelope opening. */
+.envelope-zone {
+  position: relative;
+  width: clamp(230px, 62vw, 340px);
+  /* aspect ratio of the closed envelope artwork (800 x 626) */
+  aspect-ratio: 800 / 626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Soft blurred shadow blob beneath the envelope. Animated (scale/opacity
+   only — cheap on mobile GPUs) in sync with the idle float so the shadow
+   subtly breathes as the envelope rises and settles. */
+.envelope-shadow {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 4%;
+  width: 68%;
+  height: 16%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(69, 59, 51, 0.38) 0%, rgba(69, 59, 51, 0) 72%);
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+.envelope-btn {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  padding: 0; /* the visual envelope image itself provides the tap area */
+}
+
+.envelope-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(var(--shadow-paper-md));
+  pointer-events: none;
+}
+
+/* Invitation card: starts tucked low/small behind the envelope opening,
+   GSAP animates it up and out. Always rendered above the envelope
+   image per brief (card sits ON TOP of the envelope). */
+.invitation-card {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 46%;
+  width: 78%;
+  /* aspect ratio of invitation_card.webp (626 x 800) */
+  aspect-ratio: 626 / 800;
+  opacity: 0;
+  pointer-events: none;
+  /* NOTE: transform (xPercent/yPercent/scale) is set entirely via GSAP
+     in page1.js — left out here on purpose so GSAP owns the whole
+     transform from the very first frame instead of fighting a CSS one. */
+}
+
+.invitation-card__paper {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(var(--shadow-paper-lg));
+}
+
+.invitation-card__content {
+  position: absolute;
+  inset: 13% 13% 15%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5em;
+  overflow: hidden;
+}
+
+.invitation-card__eyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 6vw, 2rem);
+  color: var(--color-brick);
+}
+
+.invitation-card__greeting {
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, 3vw, 1.05rem);
+  color: var(--color-ink-soft);
+  align-self: flex-start;
+}
+
+.invitation-card__body {
+  font-family: var(--font-body);
+  font-size: clamp(0.8rem, 2.8vw, 0.98rem);
+  line-height: 1.35;
+  color: var(--color-ink);
+}
+
+.invitation-card__closing {
+  margin-top: auto;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.15rem, 4.5vw, 1.5rem);
+  color: var(--color-teal-dark);
+}
+
+/* Stickers on the card — positioned to overlap the edges naturally */
+.invitation-card__sticker {
+  position: absolute;
+  opacity: 0;
+  filter: drop-shadow(0 6px 10px rgba(69, 59, 51, 0.2));
+}
+
+.invitation-card__sticker--photo {
+  top: -9%;
+  left: -14%;
+  width: 46%;
+  aspect-ratio: 394 / 420;
+  transform: rotate(-9deg);
+}
+
+.invitation-card__sticker--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+
+/* A little CSS washi tape "holding" the photo sticker onto the card —
+   the one paper-craft signature touch for this page. */
+.washi-tape {
+  position: absolute;
+  top: -8%;
+  left: 24%;
+  width: 46%;
+  height: 22%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(188, 204, 214, 0.75),
+    rgba(188, 204, 214, 0.75) 6px,
+    rgba(240, 238, 217, 0.75) 6px,
+    rgba(240, 238, 217, 0.75) 12px
+  );
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transform: rotate(-4deg);
+  z-index: 2;
+  opacity: 0.85;
+  box-shadow: 0 2px 4px rgba(69, 59, 51, 0.12);
+}
+
+.invitation-card__sticker--cake {
+  bottom: -8%;
+  right: -13%;
+  width: 34%;
+  aspect-ratio: 348 / 420;
+  transform: rotate(8deg);
+}
+
+.invitation-card__sticker--balloon {
+  top: -14%;
+  right: -6%;
+  width: 20%;
+  aspect-ratio: 150 / 420;
+  transform: rotate(10deg);
+}
+
+/* Buttons row below the envelope */
+.invitation-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: clamp(0.75rem, 3vw, 1.25rem);
+  opacity: 0;
+}
+
+/* "Maybe next time" panel — occupies the same slot as invitation-actions */
+.maybe-panel {
+  position: relative;
+  z-index: 2;
+  display: none; /* toggled to flex via JS when needed */
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0;
+}
+
+.maybe-panel__text {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+  color: var(--color-ink-soft);
+}
+
+/* -------------------------------------------------------------------------
+   7. PAGE 2 — SAVE THE DATE
+   ------------------------------------------------------------------------- */
+#page2 .bg-stripe {
+  background-image: url("../images/page2/background_table.jpg");
+  background-size: 200px auto;
+}
+
+#page2 .page2-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(1.5rem, 6vh, 3rem) clamp(1rem, 5vw, 2rem) clamp(2rem, 6vh, 3rem);
+  gap: clamp(0.9rem, 3vh, 1.5rem);
+}
+
+.page2-title {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.page2-title__eyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 8vw, 2.6rem);
+  color: var(--color-brick);
+  line-height: 1;
+}
+
+.page2-title__name {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  color: var(--color-ink-soft);
+  margin-top: 0.35em;
+}
+
+/* --- Calendar (HTML/CSS only — notebook look) ------------------------- */
+.calendar-wrap {
+  position: relative;
+  z-index: 2;
+  width: min(86vw, 380px);
+}
+
+/* Spiral binding, drawn entirely with CSS — a row of little rings that
+   overlap the top edge of the notebook card. */
+.calendar-spiral {
+  position: relative;
+  height: 22px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0 6%;
+}
+
+.calendar-spiral span {
+  width: 14px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-cream);
+  box-shadow:
+    inset 0 2px 3px rgba(69, 59, 51, 0.35),
+    0 2px 2px rgba(69, 59, 51, 0.12);
+  border: 1px solid rgba(69, 59, 51, 0.18);
+}
+
+.calendar-card {
+  position: relative;
+  z-index: 1;
+  margin-top: -12px;
+  background-color: #FEFCF6;
+  background-image: url("../images/shared/paper_grain.jpg");
+  background-size: 220px 220px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-paper-md);
+  padding: clamp(0.9rem, 4vw, 1.4rem) clamp(0.8rem, 3.5vw, 1.2rem) clamp(1.1rem, 4vw, 1.5rem);
+  border: 1px solid rgba(69, 59, 51, 0.08);
+}
+
+.calendar-month {
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.3rem, 5.5vw, 1.7rem);
+  color: var(--color-ink);
+  margin-bottom: 0.6em;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: clamp(3px, 1vw, 6px);
+}
+
+.calendar-day-name {
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: clamp(0.62rem, 2.6vw, 0.78rem);
+  color: var(--color-ink-soft);
+  padding-bottom: 0.3em;
+  border-bottom: 1px dashed rgba(69, 59, 51, 0.2);
+}
+
+.calendar-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: clamp(0.7rem, 3vw, 0.92rem);
+  color: var(--color-ink);
+}
+
+.calendar-cell__highlight {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: var(--color-dusty-blue);
+  opacity: 0;
+  z-index: 0;
+}
+
+.calendar-cell.is-birthday .calendar-cell__highlight {
+  opacity: 0.55;
+}
+
+.calendar-cell__num {
+  position: relative;
+  z-index: 1;
+}
+
+.calendar-cell.is-birthday .calendar-cell__num {
+  font-weight: 700;
+  color: var(--color-brick-dark);
+}
+
+/* --- Decorations (absolute, positioned via config in JS) -------------- */
+.decoration-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.decoration-layer img {
+  position: absolute;
+  width: 15vw;
+  max-width: 90px;
+  min-width: 44px;
+  filter: drop-shadow(0 6px 10px rgba(69, 59, 51, 0.18));
+  opacity: 0;
+}
+
+/* --- Cake CTA ("Click Me!") -> Page 3 ---------------------------------- */
+.cake-cta {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: clamp(0.3rem, 2vh, 0.8rem);
+  min-height: var(--tap-min);
+}
+
+.cake-cta img {
+  width: clamp(90px, 24vw, 130px);
+  filter: drop-shadow(var(--shadow-paper-sm));
+}
+
+.cake-cta__label {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  color: var(--color-teal-dark);
+  background: var(--color-cream-soft);
+  padding: 0.15em 0.9em;
+  border-radius: 999px;
+  box-shadow: var(--shadow-paper-sm);
+}
+
+@media (min-width: 700px) {
+  .calendar-wrap { width: min(420px, 32vw); }
+}
+
+/* -------------------------------------------------------------------------
+   9. PAGE 3 — DECORATE YOUR CAKE
+   ------------------------------------------------------------------------- */
+#page3 .bg-stripe {
+  background-image: url("../images/page3/background.jpg");
+  background-size: 260px auto;
+}
+
+#page3 .page3-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(1rem, 4vh, 1.6rem) clamp(0.9rem, 4vw, 1.6rem) 0;
+  gap: clamp(0.6rem, 2vh, 1rem);
+  overflow: hidden;
+}
+
+.page3-title {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.page3-title__heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  color: var(--color-brick);
+  line-height: 1;
+}
+
+.page3-title__subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, 3.2vw, 1rem);
+  color: var(--color-ink-soft);
+  margin-top: 0.3em;
+}
+
+/* --- Cake drop zone ----------------------------------------------------- */
+.cake-drop-zone {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: min(60vw, 62vh, 320px);
+  max-height: 42vh;
+  aspect-ratio: 597 / 720;
+  margin: 0 auto;
+}
+
+.cake-drop-zone__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(var(--shadow-paper-md));
+  pointer-events: none;
+  user-select: none;
+}
+
+/* A decoration placed onto the cake. Position/size are % of the drop
+   zone so Page 4 can reproduce the exact same layout regardless of
+   viewport size. */
+.cake-decoration {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg));
+}
+
+.cake-decoration--sticker { width: 15%; aspect-ratio: 1 / 1; }
+.cake-decoration--sticker svg { width: 100%; height: 100%; display: block; }
+
+.cake-decoration--letter {
+  width: 11%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Shared "torn paper" letter tile look (tray + placed-on-cake) ------ */
+.letter-tile {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-cream);
+  background-image: repeating-linear-gradient(
+    rgba(69, 59, 51, 0.08) 0 1px,
+    transparent 1px 8px
+  );
+  clip-path: polygon(
+    5% 2%, 22% 0%, 38% 3%, 55% 0%, 72% 4%, 90% 0%, 100% 15%,
+    97% 35%, 100% 55%, 96% 75%, 100% 92%, 82% 100%, 65% 96%,
+    48% 100%, 30% 97%, 12% 100%, 0% 85%, 3% 65%, 0% 45%, 4% 25%
+  );
+  box-shadow: var(--shadow-paper-sm);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 62%;
+  color: var(--color-brick-dark);
+}
+
+/* --- Deco tray ----------------------------------------------------------- */
+.deco-tray {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: min(100%, 460px);
+  background: var(--color-cream-soft);
+  border-radius: 18px 18px 0 0;
+  box-shadow: var(--shadow-paper-md);
+  padding: 0.4rem 0.6rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+}
+
+.deco-tray__toggle-row {
+  display: flex;
+  justify-content: center;
+}
+
+.deco-tray__toggle {
+  min-height: 36px;
+  padding: 0.2em 1em;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+.deco-tray__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.deco-tray__tabs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.deco-tray__tab {
+  min-height: var(--tap-min);
+  padding: 0.3em 1.1em;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-ink-soft);
+  background: transparent;
+}
+
+.deco-tray__tab.is-active {
+  background: var(--color-teal);
+  color: var(--color-cream-soft);
+}
+
+.deco-tray__scroll {
+  display: flex;
+  gap: 0.7rem;
+  overflow-x: auto;
+  padding: 0.3rem 0.2rem 0.5rem;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.deco-tray__scroll[hidden] { display: none; }
+
+.tray-item {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  scroll-snap-align: start;
+  touch-action: pan-x; /* let horizontal scroll happen natively; JS decides when a vertical move means "pick this up" instead */
+  cursor: grab;
+  filter: drop-shadow(0 4px 6px rgba(69, 59, 51, 0.16));
+}
+
+.tray-item svg { width: 100%; height: 100%; display: block; }
+
+/* --- Drag ghost (the item actually following the pointer) --------------- */
+#dragGhostLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  pointer-events: none;
+}
+
+.drag-ghost {
+  position: fixed;
+  width: 56px;
+  height: 56px;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.drag-ghost svg { width: 100%; height: 100%; }
+
+/* --- Action row (Undo / Redo / Finish) ----------------------------------- */
+.page3-actions {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom, 0px));
+}
+
+.page3-actions .paper-btn {
+  font-size: clamp(0.85rem, 3vw, 1rem);
+  padding: 0.5em 1.1em;
+}
+
+.page3-actions .paper-btn:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+/* --- "Are you happy with your cake?" confirm popup ----------------------- */
+.confirm-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 550;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(69, 59, 51, 0.28);
+  padding: 1.5rem;
+}
+
+.confirm-popup[hidden] { display: none; }
+
+.confirm-popup__card {
+  background: var(--color-cream-soft);
+  border-radius: 16px;
+  box-shadow: var(--shadow-paper-lg);
+  padding: 1.6rem 1.4rem;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+}
+
+.confirm-popup__card p {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.15rem, 4.5vw, 1.4rem);
+  color: var(--color-ink);
+  margin-bottom: 1.1rem;
+}
+
+.confirm-popup__actions {
+  display: flex;
+  gap: 0.7rem;
+  justify-content: center;
+}
+
+@media (min-width: 700px) {
+  .cake-drop-zone { width: min(30vw, 320px); max-height: 50vh; }
+  .deco-tray { border-radius: 18px; }
+  .tray-item { cursor: grab; }
+  .tray-item:hover { filter: drop-shadow(0 6px 10px rgba(69, 59, 51, 0.24)); }
+}
+
+/* -------------------------------------------------------------------------
+   10. PAGE 4 — BIRTHDAY WISHES
+   ------------------------------------------------------------------------- */
+#page4 .page4-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(1.2rem, 5vh, 2rem) clamp(1rem, 5vw, 2rem) clamp(2rem, 6vh, 3rem);
+  gap: clamp(0.5rem, 2vh, 1rem);
+}
+
+.page4-cake-zone {
+  position: relative;
+  width: min(38vw, 34vh, 190px);
+  aspect-ratio: 597 / 720;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.page4-cake-zone__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(var(--shadow-paper-md));
+  pointer-events: none;
+}
+
+/* Decorations echoed from Page 3 — same class, same % positions, just
+   re-rendered inside a differently-sized container. */
+.page4-cake-zone .cake-decoration { pointer-events: none; }
+
+.page4-candle {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  width: 24%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 4px 6px rgba(69, 59, 51, 0.2));
+  z-index: 5;
+}
+
+.page4-heading {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 6.5vw, 2rem);
+  color: var(--color-brick);
+  text-align: center;
+}
+
+.wishes-grid {
+  flex-shrink: 0;
+  width: min(92vw, 460px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(0.6rem, 3vw, 1rem);
+}
+
+.wish-card {
+  position: relative;
+}
+
+.wish-card img {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(var(--shadow-paper-sm));
+}
+
+.wish-card__content {
+  position: absolute;
+  inset: 14% 12%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.wish-card__message {
+  font-family: var(--font-body);
+  font-size: clamp(0.62rem, 2.6vw, 0.78rem);
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+
+/* Custom wish sits below note 3 & 4, spanning the row but NOT centered
+   (brief: "bukan di tengah") — flush to the start of the grid instead. */
+.wish-card--custom {
+  grid-column: 1 / span 1;
+  grid-row: 3;
+}
+
+.custom-wish-form {
+  position: absolute;
+  inset: 13% 11%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  align-items: stretch;
+}
+
+.custom-wish-form input,
+.custom-wish-form textarea {
+  font-family: var(--font-body);
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(69, 59, 51, 0.35);
+  text-align: center;
+  font-size: clamp(0.6rem, 2.4vw, 0.74rem);
+  color: var(--color-ink);
+  padding: 0.15em 0;
+  min-height: 20px;
+}
+
+.custom-wish-form textarea {
+  resize: none;
+  flex: 1;
+  min-height: 2.6em;
+}
+
+.custom-wish-form input:focus,
+.custom-wish-form textarea:focus {
+  outline: none;
+  border-bottom-color: var(--color-teal-dark);
+}
+
+.custom-wish-error {
+  display: none;
+  font-family: var(--font-body);
+  font-size: clamp(0.55rem, 2.2vw, 0.66rem);
+  color: var(--color-brick);
+}
+
+.custom-wish-error.is-visible { display: block; }
+
+.custom-wish-send {
+  align-self: center;
+  min-height: 30px;
+  padding: 0.2em 1em;
+  font-size: clamp(0.7rem, 2.6vw, 0.85rem);
+}
+
+.wish-result {
+  position: absolute;
+  inset: 13% 11%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.25em;
+  overflow: hidden;
+}
+
+.wish-result.is-visible { display: flex; }
+
+.wish-result__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 3.2vw, 1.05rem);
+  color: var(--color-teal-dark);
+}
+
+.wish-result__message {
+  font-family: var(--font-body);
+  font-size: clamp(0.62rem, 2.6vw, 0.78rem);
+  color: var(--color-ink);
+  line-height: 1.3;
+}
+
+.blow-btn {
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+/* Smoke puffs spawned by JS when the candle is blown out */
+.smoke-puff {
+  position: fixed;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(198, 195, 188, 0.55), rgba(198, 195, 188, 0));
+  filter: blur(4px);
+  pointer-events: none;
+  z-index: 450;
+}
+
+/* Soft white overlay used for the candle-blow smoke moment. Separate
+   from .flash-overlay (which is used for hard page-to-page cuts) — this
+   one only ever reaches partial opacity for the local "poof" beat,
+   the bigger escalation into Page 5 reuses .flash-overlay instead. */
+.blow-overlay {
+  position: fixed;
+  inset: 0;
+  background: #FFFDF8;
+  opacity: 0;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+  z-index: 420;
+}
+
+@media (min-width: 700px) {
+  .page4-cake-zone { width: min(20vw, 200px); }
+}
+
+/* -------------------------------------------------------------------------
+   11. PAGE 5 — THANK YOU
+   ------------------------------------------------------------------------- */
+#page5 .page5-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.thankyou-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 360px;
+}
+
+.thankyou-text__line {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 9vw, 3rem);
+  line-height: 1.08;
+  color: var(--color-ink);
+}
+
+.thankyou-text__extra {
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem, 3.6vw, 1.05rem);
+  color: var(--color-ink-soft);
+  margin-top: 0.7em;
+}
+
+.thankyou-text__heart {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 7vw, 2.3rem);
+  color: var(--color-brick);
+  margin-top: 0.3em;
+}
+
+.page5-decoration-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.page5-decoration-layer img {
+  position: absolute;
+  width: 14vw;
+  max-width: 82px;
+  min-width: 40px;
+  opacity: 0;
+  filter: drop-shadow(0 6px 10px rgba(69, 59, 51, 0.16));
+}
+
+/* -------------------------------------------------------------------------
+   12. RESPONSIVE — shared rules that apply across every page
+   ------------------------------------------------------------------------- */
+@media (min-width: 700px) {
+  .envelope-zone { width: min(360px, 34vw); }
+
+  .paper-btn { cursor: pointer; }
+  .paper-btn:hover { box-shadow: var(--shadow-paper-md); }
+
+  .envelope-btn { cursor: pointer; }
+  .cake-cta { cursor: pointer; }
+}
+
+/* Respect reduced-motion preference: GSAP timelines still run (content
+   must remain reachable) but we shorten/soften anything ambient. */
+@media (prefers-reduced-motion: reduce) {
+  .bg-stripe { background-attachment: scroll; }
+}
